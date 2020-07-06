@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.3.4" orientation="isometric" renderorder="right-down" width="10" height="10" tilewidth="256" tileheight="149" infinite="0" nextlayerid="4" nextobjectid="1">
+ <tileset firstgid="1" source="ways.tsx"/>
+ <layer id="1" name="floor" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjZmBgYEbCLGh8ZMyIpgafWmLk0c0lB7Og2YNuJ7lmk6sPn1uICRsA72QBLw==
+  </data>
+ </layer>
+ <layer id="2" name="items" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYKA+YCJTbqgAbH6glr8AB5AACQ==
+  </data>
+ </layer>
+ <layer id="3" name="city" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAMsFGof7DbR28AAA6wAA0=
+  </data>
+ </layer>
+</map>
