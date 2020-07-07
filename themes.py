@@ -66,7 +66,7 @@ locked = os.getcwd() + r"/images/doors.png"
 theme_door.add_button_textures(normal, hover, clicked, locked)
 
 theme = arcade.gui.Theme()
-theme.set_font(24, arcade.color.WHITE)
+theme.set_font(18, arcade.color.DARK_JUNGLE_GREEN)
 normal = ":resources:gui_themes/Fantasy/Buttons/Normal.png"
 hover = ":resources:gui_themes/Fantasy/Buttons/Hover.png"
 clicked = ":resources:gui_themes/Fantasy/Buttons/Clicked.png"
@@ -74,7 +74,7 @@ locked = ":resources:gui_themes/Fantasy/Buttons/Locked.png"
 theme.add_button_textures(normal, hover, clicked, locked)
 
 theme_textbox_button = arcade.gui.Theme()
-theme_textbox_button.set_font(24, arcade.color.WHITE)
+theme_textbox_button.set_font(12, arcade.color.AMBER)
 normal = os.getcwd() + r"/images/Brown.png"
 clicked = os.getcwd() + r"/images/LightBrown.png"  # hover
 locked = os.getcwd() + r"/images/LightBrown.png"  # pressed
@@ -88,7 +88,7 @@ locked = os.getcwd() + r"/images/tab_locked.png"  # pressed
 theme_tabs.add_button_textures(normal, hover, clicked, locked)
 
 theme_text = arcade.gui.Theme()
-theme.set_font(24, arcade.color.BLACK)
+theme_text.set_font(24, arcade.color.BLACK)
 
 scroll_theme = arcade.gui.Theme()
 normal = os.getcwd() + r"/images/scroll_rect.png"
