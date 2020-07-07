@@ -22,6 +22,9 @@ buildings = {'Хижина': [[None], 100, [60, 40, 0, 5], r"/images/house.png",
 
              }
 
+b_buttons = {'Казармы': build.BarracksButton,
+             'Хижина': build.HouseButton}
+
 b = []  # Временные здания, доступные для постройки
 
 for o in range(10):
