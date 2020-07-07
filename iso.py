@@ -15,12 +15,14 @@ import os
 import mygame
 import gui
 import themes
+import iso_func
+import config
 
 SPRITE_SCALING = 0.5
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Isometric Example"
+SCREEN_WIDTH = config.SCREEN_WIDTH
+SCREEN_HEIGHT = config.SCREEN_HEIGHT
+SCREEN_TITLE = "Isometric Map"
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
@@ -32,59 +34,6 @@ TILE_WIDTH = 256
 TILE_HEIGHT = 149
 mh = 10  # self.my_map.height
 mw = 10  # self.my_map.width
-
-
-def cartToIso(cartX, cartY):
-    isoX = (cartX - cartY)
-    isoY = (cartX + cartY) / 2
-    pos = (isoX, isoY)
-    return pos
-
-
-def get_screen_coordinates(tile_x, tile_y, width=mw, height=mh, tilewidth=TILE_WIDTH, tileheight=TILE_HEIGHT):
-    screen_x = tilewidth * tile_x // 2 + height * tilewidth // 2 - tile_y * tilewidth // 2
-    screen_y = (height - tile_y - 1) * tileheight // 2 + width * tileheight // 2 - tile_x * tileheight // 2
-    return screen_x, screen_y
-
-
-def screen_to_isometric_grid(cartX, cartY):
-    screenx = mh - cartY / (TILE_HEIGHT * SPRITE_SCALING) + cartX / (TILE_WIDTH * SPRITE_SCALING) - mw / 2 - 1 / 2
-    screeny = mh - cartY / (TILE_HEIGHT * SPRITE_SCALING) - cartX / (TILE_WIDTH * SPRITE_SCALING) + mw / 2 - 1 / 2
-    screenx2 = round(screenx)
-    screeny2 = round(screeny)
-    return screenx2, screeny2
-
-
-def read_sprite_list(grid, sprite_list):
-    for row in grid:
-        for grid_location in row:
-            if grid_location.tile is not None:
-                tile_sprite = arcade.Sprite("./resources/images/" + grid_location.tile.source, SPRITE_SCALING)
-                tile_sprite.center_x = grid_location.center_x * SPRITE_SCALING
-                tile_sprite.center_y = grid_location.center_y * SPRITE_SCALING
-                sprite_list.append(tile_sprite)
-
-
-def check_mouse_press_for_buttons(x, y, button_list):
-    """ Given an x, y, see if we need to register any button clicks. """
-    for button in button_list:
-        if x > button.center_x + button.width / 2:
-            continue
-        if x < button.center_x - button.width / 2:
-            continue
-        if y > button.center_y + button.height / 2:
-            continue
-        if y < button.center_y - button.height / 2:
-            continue
-        button.on_press()
-
-
-def check_mouse_release_for_buttons(_x, _y, button_list):
-    """ If a mouse button has been released, see if we need to process
-        any release events. """
-    for button in button_list:
-        if button.pressed:
-            button.on_release()
 
 
 class Camera(arcade.Sprite):
@@ -102,10 +51,11 @@ class City(arcade.Sprite):
 
 class Iso(arcade.View):
 
-    def __init__(self):
+    def __init__(self, window):
         super().__init__()
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
+        self.window = window
         self.tileS = 0, 0
         self.tileSS = 0, 0
         self.startX = 0
@@ -139,8 +89,6 @@ class Iso(arcade.View):
         self.text_label = None
         self.door_button = None
 
-
-
     def setup(self):
         # Sprite lists
         self.player_list = arcade.SpriteList()
@@ -148,7 +96,6 @@ class Iso(arcade.View):
         self.floor_list = arcade.SpriteList()
         self.objects_list = arcade.SpriteList()
         self.hightlight_list = arcade.SpriteList()
-
 
         # noinspection PyDeprecation
         self.my_map = arcade.read_tiled_map('./resources/tmx_maps/wayss.tmx', SPRITE_SCALING)
@@ -175,9 +122,9 @@ class Iso(arcade.View):
         self.hightlight_list.append(self.hightlight_sprite)
         self.hightlight_list.append(self.label_sprite)
 
-        read_sprite_list(self.my_map.layers["floor"], self.floor_list)
-        read_sprite_list(self.my_map.layers["items"], self.wall_list)
-        read_sprite_list(self.my_map.layers["city"], self.objects_list)
+        iso_func.read_sprite_list(self.my_map.layers["floor"], self.floor_list)
+        iso_func.read_sprite_list(self.my_map.layers["items"], self.wall_list)
+        iso_func.read_sprite_list(self.my_map.layers["city"], self.objects_list)
         self.get_pos_list(self.objects_list)
         self.get_pos_list(self.wall_list)
         # Set the background color
@@ -195,7 +142,7 @@ class Iso(arcade.View):
 
     def get_pos_list(self, list_to_add):
         for h in list_to_add:
-            self.pos_list[screen_to_isometric_grid(h.center_x, h.center_y)] = (h.center_x, h.center_y), h
+            self.pos_list[iso_func.screen_to_isometric_grid(h.center_x, h.center_y)] = (h.center_x, h.center_y), h
 
     def on_draw(self):
         arcade.start_render()
@@ -219,9 +166,9 @@ class Iso(arcade.View):
                                  j.center_y - 10, arcade.color.BLUE, 12)
             for tile_x in range(self.my_map.width):
                 for tile_y in range(self.my_map.height):
-                    screen_x, screen_y = get_screen_coordinates(tile_x, tile_y,
-                                                                self.my_map.width, self.my_map.height,
-                                                                self.my_map.tilewidth, self.my_map.tileheight)
+                    screen_x, screen_y = iso_func.get_screen_coordinates(tile_x, tile_y,
+                                                                         self.my_map.width, self.my_map.height,
+                                                                         self.my_map.tilewidth, self.my_map.tileheight)
 
                     arcade.draw_text(f"{tile_x}, {tile_y}",
                                      screen_x * SPRITE_SCALING, (screen_y * SPRITE_SCALING) + 10,
@@ -244,16 +191,17 @@ class Iso(arcade.View):
         self.startX = x
         self.startY = y
         self.mouse_move = False
-        check_mouse_press_for_buttons(screen_x, screen_y, self.button_list)
-        print(self.view_left, self.view_bottom)
+        iso_func.check_mouse_press_for_buttons(screen_x, screen_y, self.button_list)
+
+        # print(self.view_left, self.view_bottom)
 
         def create_new_city():
             new_city = City()
             new_city.center_x = screen_x
             new_city.center_y = screen_y
             self.objects_list.append(new_city)
-            self.pos_list[screen_to_isometric_grid(new_city.center_x, new_city.center_y)] = (new_city.center_x,
-                                                                                             new_city.center_y), new_city
+            self.pos_list[iso_func.screen_to_isometric_grid(new_city.center_x, new_city.center_y)] = (new_city.center_x,
+                                                                                                      new_city.center_y), new_city
         # print(f"({x}, {y}) | ({screen_x}, {screen_y}) -> ()")
 
     def on_mouse_release(self, x: float, y: float, button: int, modifiers: int):
@@ -261,7 +209,7 @@ class Iso(arcade.View):
 
         self.view_left = int(self.view_left)
         self.view_bottom = int(self.view_bottom)
-        check_mouse_release_for_buttons(x, y, self.button_list)
+        iso_func.check_mouse_release_for_buttons(x, y, self.button_list)
         # arcade.set_viewport(self.view_left,SCREEN_WIDTH + self.view_left,self.view_bottom,SCREEN_HEIGHT + self.view_bottom)
         # print(self.view_left, SCREEN_WIDTH + self.view_left, self.view_bottom, SCREEN_HEIGHT + self.view_bottom)
 
@@ -275,7 +223,7 @@ class Iso(arcade.View):
         dif_y = self.startY - y
         # print(f"Разница: {dif_x}, {dif_y}, {self.mouse_move}")
         self.tileS = (screen_x, screen_y)
-        self.tileSS = screen_to_isometric_grid(screen_x, screen_y)
+        self.tileSS = iso_func.screen_to_isometric_grid(screen_x, screen_y)
         self.get_highlight(self.tileSS[0], self.tileSS[1])
         changed = False
 
@@ -305,7 +253,7 @@ class Iso(arcade.View):
             # self.mouse_move=False
 
     def get_highlight(self, tileX, tileY):
-        xt, yt = get_screen_coordinates(tileX, tileY)
+        xt, yt = iso_func.get_screen_coordinates(tileX, tileY)
         self.hightlight_sprite.center_x = xt * SPRITE_SCALING
         self.hightlight_sprite.center_y = yt * SPRITE_SCALING
         for sprite_pos in self.pos_list:
@@ -344,10 +292,10 @@ class Iso(arcade.View):
             self.window.set_fullscreen(not self.window.fullscreen)
             width, height = self.window.get_size()
             self.window.set_viewport(0, width, 0, height)
-            #self.window.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
+            # self.window.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
 
         elif key == arcade.key.G:
-            game_view = mygame.MyGame()
+            game_view = mygame.MyGame(self.window)
             self.window.set_viewport(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT)
             self.window.show_view(game_view)
             game_view.setup()

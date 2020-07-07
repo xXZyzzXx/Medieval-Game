@@ -32,11 +32,12 @@ def check_mouse_hover_for_buttons(x, y, button_list):  # Доработать, �
 
 
 class MyGame(arcade.View):
-    def __init__(self):
+    def __init__(self, window):
         super().__init__()
         file_path = os.path.dirname(os.path.abspath(__file__))
         os.chdir(file_path)
         arcade.set_background_color(arcade.color.AMAZON)
+        self.window = window
         self.pause = False
         self.text = "Medieval Game"
         self.background = None
@@ -148,7 +149,7 @@ class MyGame(arcade.View):
             self.sidebar_nav.update_pos(width, height)
 
         elif key == arcade.key.G:
-            game_view = iso.Iso()
+            game_view = iso.Iso(self.window)
             game_view.setup()
             self.window.show_view(game_view)
 
@@ -205,7 +206,7 @@ class MyGame(arcade.View):
         self.button_list.append(
             gui.MailButton(self.dialogue_box_list, (width / 2), height - 55))
         self.button_list.append(
-            gui.LawButton(self.dialogue_box_list, (width / 2) + 100, height - 55))
+            gui.MapButton(self.dialogue_box_list, self.window, (width / 2) + 100, height - 55))
 
         # music_button = gui.MusicButton(self.music, 50, SCREEN_HEIGHT - 55)
         # self.button_list.append(music_button)
@@ -326,7 +327,7 @@ class MyGame(arcade.View):
 
 def main():
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Medieval Game", fullscreen=False)
-    main_view = MyGame()  # iso.Iso()
+    main_view = MyGame(window)  # iso.Iso()
     window.show_view(main_view)
     main_view.setup()
     arcade.run()
