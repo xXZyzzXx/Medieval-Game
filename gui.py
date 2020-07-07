@@ -3,6 +3,7 @@ import themes
 import config
 import os
 import gui_advanced as ga
+import iso
 
 
 class MenuBox:
@@ -327,10 +328,11 @@ class MailButton(ga.AdvancedButton):
             #self.dialoguebox_list[0].active = True
 
 
-class LawButton(ga.AdvancedButton):
-    def __init__(self, dialoguebox_list, x, y, width=80, height=80, text=""):
-        super().__init__(x, y, width, height, text, theme=themes.theme_law)
+class MapButton(ga.AdvancedButton):
+    def __init__(self, dialoguebox_list, window, x, y, width=70, height=70, text=""):
+        super().__init__(x, y, width, height, text, theme=themes.theme_map)
         self.dialoguebox_list = dialoguebox_list
+        self.window = window
 
     def on_press(self):
         if not self.dialoguebox_list[0].active and not self.dialoguebox_list[1].active and not self.dialoguebox_list[
@@ -340,6 +342,9 @@ class LawButton(ga.AdvancedButton):
     def on_release(self):
         if self.pressed:
             self.pressed = False
+            view = iso.Iso(self.window)
+            view.setup()
+            self.window.show_view(view)
             #giself.dialoguebox_list[0].active = True
 
 
