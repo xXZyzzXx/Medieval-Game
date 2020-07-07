@@ -3,7 +3,6 @@ import themes
 import config
 import os
 import gui_advanced as ga
-import buildings as bd
 
 
 class MenuBox:
@@ -104,6 +103,7 @@ class MenuBox:
             self.building_list = all_buildings
 
     def create_building_content(self):  # Добавить обновление только для скролла и зданий
+        self.delete_dialoguebox_content()
         self.update_building_content()
         list_buildings_to_create = self.building_list[int(0 + float(self.how_scrolling)):int(
             config.buildings_in_menu + float(self.how_scrolling))]  # Срез для отображения фиксированного кол-ва зданий
@@ -206,11 +206,13 @@ class MenuBox:
                 i += 1
 
     def create_house_content(self, name, icon, t_build, c_wood, c_food, c_iron, c_clay, b_lvl):
+        self.delete_dialoguebox_content()
         self.button_list.append(CloseButton(self, self.x, self.y - self.height / 4))
 
-        self.icon_list.append(
-            arcade.Sprite(os.getcwd() + icon, 0.4, center_x=self.x - self.width / 3, center_y=self.y + 100))
-
+        icon = arcade.Sprite(os.getcwd() + icon, 0.4, center_x=self.x - self.width / 3, center_y=self.y + 100)
+        self.icon_list.append(icon)
+        self.button_list.append(
+            DestroyButton(self, self.global_butt_list, self.global_dialog_list, int(icon.center_x), int(icon.center_y-(icon.height/2)*1.3)))
         self.text_list.append(
             arcade.gui.TextLabel(f'{name}, уровень {b_lvl}', self.x, self.y + self.height / 2.4,
                                  themes.theme_text.font_color, bold=True, align='center'))
@@ -262,7 +264,7 @@ class SideNav(arcade.Sprite):
 
 
 class CloseButton(ga.AdvancedButton):
-    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Close"):
+    def __init__(self, dialoguebox, x, y, width=110, height=50, text="Закрыть"):
         super().__init__(x, y, width, height, text, theme=themes.theme)
         self.dialoguebox = dialoguebox
 
@@ -338,7 +340,7 @@ class LawButton(ga.AdvancedButton):
     def on_release(self):
         if self.pressed:
             self.pressed = False
-            #self.dialoguebox_list[0].active = True
+            #giself.dialoguebox_list[0].active = True
 
 
 class Foundament(ga.AdvancedButton):
@@ -396,13 +398,14 @@ class BuildingButton(ga.AdvancedButton):
     def on_release(self):
         if self.pressed:
             self.pressed = False
-            if self.building.name == 'Казармы':
-                self.to_build = bd.BarracksButton(self.global_dialog_list, self.dialog)
-                self.to_build.current_place = self.to_build
-            else:
-                pass
-                self.to_build = Foundament(self.global_dialog_list, self.global_butt_list)
-                self.to_build.current_place = self.to_build
+            for b in config.b_buttons:
+                if self.building.name == b:
+                    self.to_build = config.b_buttons[self.building.name](self.global_dialog_list, self.dialog)
+                    self.to_build.current_place = self.to_build
+                    break
+                else:
+                    self.to_build = Foundament(self.global_dialog_list, self.global_butt_list)
+                    self.to_build.current_place = self.to_build
 
             self.global_butt_list.remove(self.dialog.current_place)
             self.to_build.center_x, self.to_build.center_y = self.dialog.current_place.center_x, self.dialog.current_place.center_y
@@ -413,11 +416,12 @@ class BuildingButton(ga.AdvancedButton):
 
 
 class DestroyButton(ga.AdvancedButton):
-    def __init__(self, building, x=0, y=0, width=180, height=50, text="DESTROY"):
-        super().__init__(x, y, width, height, text, theme=themes.theme, font_size=6)
-        self.dialoguebox = building[0]
-        self.butt_list = building[1]  # Список зданий
-        self.dialogue_box_list = building[2]
+    def __init__(self, dialog, global_butt_list, global_dialog_list, x=0, y=0, width=90, height=25, text="Разрушить"):
+        super().__init__(x, y, width, height, text, theme=themes.theme_textbox_button, font_size=6)
+        self.global_butt_list = global_butt_list
+        self.global_dialog_list = global_dialog_list
+
+        self.dialog = dialog
         self.to_build = None
 
     def on_press(self):
@@ -426,15 +430,15 @@ class DestroyButton(ga.AdvancedButton):
     def on_release(self):
         if self.pressed:
             self.pressed = False
-            self.to_build = Foundament(self.dialogue_box_list, self.butt_list)  # При разрушении здания
+            self.to_build = Foundament(self.global_dialog_list, self.global_butt_list)  # При разрушении здания
             self.to_build.current_place = self.to_build  # указывается новое текущее здание: фундамент
 
-            self.butt_list.remove(self.dialoguebox.current_place)  # Удалить текущее здание из основного списка кнопок
-            self.to_build.center_x, self.to_build.center_y = self.dialoguebox.current_place.center_x, self.dialoguebox.current_place.center_y  # Поменять расположение
-            for dialog in self.dialogue_box_list:  # Установить текущее здание to build для всех окон dialoguebox
+            self.global_butt_list.remove(self.dialog.current_place)
+            self.to_build.center_x, self.to_build.center_y = self.dialog.current_place.center_x, self.dialog.current_place.center_y
+            for dialog in self.global_dialog_list:  # Установить текущее здание to build для всех окон dialoguebox
                 dialog.current_place = self.to_build
-            self.butt_list.append(self.to_build)  # Добавить в основной список зданий (кнопок)
-            self.dialoguebox.active = False
+            self.global_butt_list.append(self.to_build)
+            self.dialog.active = False
 
 
 class ScrollRect(ga.AdvancedButton):  # Доделать скролл перетягиванием мыши
