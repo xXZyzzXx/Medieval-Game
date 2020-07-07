@@ -39,6 +39,43 @@ class BarracksButton(ga.AdvancedButton):
         pass
 
 
+class HouseButton(ga.AdvancedButton):
+    def __init__(self, dialoguebox_list, dialog, x=0, y=0, width=225, height=200, text=""):
+        super().__init__(x, y, width, height, text, theme=themes.theme_house)
+        self.dialoguebox_list = dialoguebox_list
+        self.dialog = dialog
+        self.current_place = None
+        # ====
+        self.name = 'Хижина'
+        self.image_icon = r"/images/house.png"
+        self.building_type = 'Социальные'
+        self.technologies_for_unlock = [None]
+        self.time_building = 100
+        self.cost_wood = 60
+        self.cost_food = 0
+        self.cost_iron = 40
+        self.cost_clay = 5
+        self.b_lvl = 1
+
+    def on_press(self):
+        if not self.dialoguebox_list[0].active and not self.dialoguebox_list[1].active and not self.dialoguebox_list[
+            2].active:
+            self.pressed = True
+
+    def on_release(self):
+        if self.pressed:
+            self.pressed = False
+            self.dialoguebox_list[2].current_place = self.current_place
+            self.dialog.delete_dialoguebox_content()
+            self.dialoguebox_list[0].create_house_content(self.name, self.image_icon, self.time_building,
+                                                          self.cost_wood, self.cost_food,
+                                                          self.cost_iron, self.cost_clay, self.b_lvl)
+            self.dialoguebox_list[0].active = True
+
+    def update(self):
+        pass
+
+
 class Building_House:
     def __init__(self):
         self.name = 'Хижина'
