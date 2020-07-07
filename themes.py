@@ -24,12 +24,11 @@ clicked = os.getcwd() + r"/images/letter_click.png"
 locked = os.getcwd() + r"/images/letter_click.png"
 theme_mail.add_button_textures(normal, clicked, locked)
 
-theme_law = arcade.gui.Theme()
-theme_law.set_font(24, arcade.color.WHITE)
-normal = os.getcwd() + r"/images/pechat.png"
-clicked = os.getcwd() + r"/images/pechat_click.png"
-locked = os.getcwd() + r"/images/pechat_click.png"
-theme_law.add_button_textures(normal, clicked, locked)
+theme_map = arcade.gui.Theme()
+theme_map.set_font(24, arcade.color.WHITE)
+normal = os.getcwd() + r"/images/map.png"
+clicked = os.getcwd() + r"/images/map_click.png"
+theme_map.add_button_textures(normal=normal, clicked=clicked)
 
 theme_found = arcade.gui.Theme()
 theme_found.set_font(24, arcade.color.WHITE)
